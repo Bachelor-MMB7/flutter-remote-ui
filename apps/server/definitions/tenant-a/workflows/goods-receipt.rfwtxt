@@ -1,0 +1,94 @@
+import core.widgets;
+import local.widgets;
+
+// tenant-a "Acme Corp" — goods receipt: 3 screens (Receive -> Store -> Summary)
+// Process steps per ten Hompel & Schmidt, Warehouse Management
+
+// Step 0: Receive — identification + quantity check + condition photo (quality inspection)
+widget Step0 = ActivityContainer(
+  child: ListView(
+    children: [
+      ActivityHeader(step: 1, title: "Goods Receipt — Acme Corp"),
+      TextInput(
+        label: "Order number",
+        onChanged: event "setOrderNumber" { },
+      ),
+      SizedBox(height: 16.0),
+      ProductDetail(
+        description: "Screws M6x20",
+        sku: "ACM-001",
+      ),
+      QuantityStepper(
+        label: "Received quantity",
+        value: data.workflow.quantity,
+        onIncrement: event "incrementQuantity" { },
+        onDecrement: event "decrementQuantity" { },
+      ),
+      SizedBox(height: 16.0),
+      PhotoButton(
+        text: "Add condition photo",
+        onPressed: event "photoTaken" { },
+      ),
+      SizedBox(height: 16.0),
+      ImagePreview(previewPath: data.workflow.photoPath),
+      ConfirmButton(
+        text: "Continue",
+        require: true,
+        requiredValue: data.workflow.orderNumber,
+        onPressed: event "next" { },
+      ),
+    ]
+  )
+);
+
+// Step 1: Store — putaway (storage location)
+widget Step1 = ActivityContainer(
+  child: ListView(
+    children: [
+      ActivityHeader(step: 2, title: "Storage Location"),
+      SelectableOption(
+        label: "Main Warehouse — Gate 1",
+        value: "Main Warehouse — Gate 1",
+        selectedValue: data.workflow.location,
+        onPressed: event "selectLocation" { location: "Main Warehouse — Gate 1" },
+      ),
+      SelectableOption(
+        label: "Cold Storage",
+        value: "Cold Storage",
+        selectedValue: data.workflow.location,
+        onPressed: event "selectLocation" { location: "Cold Storage" },
+      ),
+      SizedBox(height: 16.0),
+      ConfirmButton(
+        text: "Continue",
+        require: true,
+        requiredValue: data.workflow.location,
+        onPressed: event "next" { },
+      ),
+    ]
+  )
+);
+
+// Step 2: Summary — posting confirmation
+widget Step2 = ActivityContainer(
+  child: ListView(
+    children: [
+      ActivityHeader(step: 3, title: "Receipt Summary"),
+      SizedBox(height: 16.0),
+      SummaryRow(label: "Order number", value: data.workflow.orderNumber),
+      SummaryRow(label: "Product", value: "Screws M6x20"),
+      SummaryRow(label: "SKU", value: "ACM-001"),
+      SummaryRow(label: "Quantity", value: data.workflow.quantity),
+      SummaryRow(label: "Location", value: data.workflow.location),
+      SizedBox(height: 16.0),
+      ImagePreview(
+        previewPath: data.workflow.photoPath,
+      ),
+      SizedBox(height: 16.0),
+      ConfirmButton(
+        text: "Confirm Receipt",
+        onPressed: event "submit" { },
+      ),
+    ]
+  )
+);

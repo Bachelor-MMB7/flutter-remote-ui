@@ -1,0 +1,115 @@
+import core.widgets;
+import local.widgets;
+
+// Offline default — generic goods receipt (shown only when server AND cache are unavailable).
+// Belongs to no tenant. No customer names, no customer-specific storage locations.
+
+// Step 0: Receive — identification + quantity check
+widget Step0 = ActivityContainer(
+  child: ListView(
+    children: [
+      ActivityHeader(step: 1, title: "Goods Receipt"),
+      TextInput(
+        label: "Order number",
+        onChanged: event "setOrderNumber" { },
+      ),
+      SizedBox(height: 16.0),
+      ProductDetail(
+        description: "Screws M6x20",
+        sku: "GR-001",
+      ),
+      QuantityStepper(
+        label: "Received quantity",
+        value: data.workflow.quantity,
+        onIncrement: event "incrementQuantity" { },
+        onDecrement: event "decrementQuantity" { },
+      ),
+      SizedBox(height: 16.0),
+      ConfirmButton(
+        text: "Continue",
+        require: true,
+        requiredValue: data.workflow.orderNumber,
+        onPressed: event "next" { },
+      ),
+    ]
+  )
+);
+
+// Step 1: Quality inspection — condition / damage photo
+widget Step1 = ActivityContainer(
+  child: ListView(
+    children: [
+      ActivityHeader(step: 2, title: "Quality Inspection"),
+      InfoBox(text: "Check the goods for damage and photograph any issues."),
+      SizedBox(height: 16.0),
+      PhotoButton(
+        text: "Add condition photo",
+        onPressed: event "photoTaken" { },
+      ),
+      SizedBox(height: 16.0),
+      ImagePreview(previewPath: data.workflow.photoPath),
+      ConfirmButton(
+        text: "Continue",
+        onPressed: event "next" { },
+      ),
+    ]
+  )
+);
+
+// Step 2: Store — putaway (storage location)
+widget Step2 = ActivityContainer(
+  child: ListView(
+    children: [
+      ActivityHeader(step: 3, title: "Storage Location"),
+      SelectableOption(
+        label: "Main Warehouse",
+        value: "Main Warehouse",
+        selectedValue: data.workflow.location,
+        onPressed: event "selectLocation" { location: "Main Warehouse" },
+      ),
+      SelectableOption(
+        label: "Cold Storage",
+        value: "Cold Storage",
+        selectedValue: data.workflow.location,
+        onPressed: event "selectLocation" { location: "Cold Storage" },
+      ),
+      SelectableOption(
+        label: "Bulk Storage",
+        value: "Bulk Storage",
+        selectedValue: data.workflow.location,
+        onPressed: event "selectLocation" { location: "Bulk Storage" },
+      ),
+      SizedBox(height: 16.0),
+      ConfirmButton(
+        text: "Continue",
+        require: true,
+        requiredValue: data.workflow.location,
+        onPressed: event "next" { },
+      ),
+    ]
+  )
+);
+
+// Step 3: Summary — posting confirmation
+widget Step3 = ActivityContainer(
+  child: ListView(
+    children: [
+      ActivityHeader(step: 4, title: "Receipt Summary"),
+      SizedBox(height: 16.0),
+      SummaryRow(label: "Order number", value: data.workflow.orderNumber),
+      SummaryRow(label: "Product", value: "Screws M6x20"),
+      SummaryRow(label: "SKU", value: "GR-001"),
+      SummaryRow(label: "Quantity", value: data.workflow.quantity),
+      SummaryRow(label: "Location", value: data.workflow.location),
+      SizedBox(height: 16.0),
+      ImagePreview(
+        previewPath: data.workflow.photoPath,
+      ),
+      SizedBox(height: 16.0),
+      ConfirmButton(
+        text: "Confirm Receipt",
+        onPressed: event "submit" { },
+      ),
+    ]
+  )
+);

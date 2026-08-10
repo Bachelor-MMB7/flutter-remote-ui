@@ -1,0 +1,56 @@
+import core.widgets;
+import local.widgets;
+
+widget Step0 = ActivityContainer(
+  child: ListView(
+    children: [
+      ActivityHeader(step: 1, title: "Pick Order"),
+      SizedBox(height: 16.0),
+      TextInput(label: "Pick order number", onChanged: event "setOrderNumber" { }),
+      SizedBox(height: 16.0),
+      ConfirmButton(
+        text: "Continue",
+        require: true,
+        requiredValue: data.workflow.orderNumber,
+        onPressed: event "next" { },
+      ),
+    ]
+  )
+);
+
+widget Step1 = ActivityContainer(
+  child: ListView(
+    children: [
+      ActivityHeader(step: 2, title: "Pick Item"),
+      SizedBox(height: 16.0),
+      InfoBox(text: "Go to Rack A-12"),
+      SizedBox(height: 16.0),
+      ProductDetail(description: "Washers", sku: "WAS-001"),
+      SizedBox(height: 16.0),
+      QuantityStepper(
+        label: "Picked quantity",
+        value: data.workflow.quantity,
+        onIncrement: event "incrementQuantity" { },
+        onDecrement: event "decrementQuantity" { },
+      ),
+      SizedBox(height: 16.0),
+      ConfirmButton(text: "Continue", onPressed: event "next" { }),
+    ]
+  )
+);
+
+widget Step2 = ActivityContainer(
+  child: ListView(
+    children: [
+      ActivityHeader(step: 3, title: "Summary"),
+      SizedBox(height: 16.0),
+      SummaryRow(label: "Pick order number", value: data.workflow.orderNumber),
+      SummaryRow(label: "Product", value: "Washers"),
+      SummaryRow(label: "SKU", value: "WAS-001"),
+      SummaryRow(label: "Quantity", value: data.workflow.quantity),
+      SummaryRow(label: "Rack", value: "Rack A-12"),
+      SizedBox(height: 16.0),
+      ConfirmButton(text: "Confirm", onPressed: event "submit" { }),
+    ]
+  )
+);

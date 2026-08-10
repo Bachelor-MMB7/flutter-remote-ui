@@ -1,0 +1,115 @@
+import core.widgets;
+import local.widgets;
+
+// tenant-b "SDUI Industries" — goods receipt: 4 screens (Receive -> Inspect -> Store -> Summary)
+// Process steps per ten Hompel & Schmidt, Warehouse Management
+
+// Step 0: Receive — identification + quantity check
+widget Step0 = ActivityContainer(
+  child: ListView(
+    children: [
+      ActivityHeader(step: 1, title: "Goods Receipt — SDUI Industries"),
+      TextInput(
+        label: "Order number",
+        onChanged: event "setOrderNumber" { },
+      ),
+      SizedBox(height: 16.0),
+      ProductDetail(
+        description: "Washers",
+        sku: "WAS-001",
+      ),
+      QuantityStepper(
+        label: "Received quantity",
+        value: data.workflow.quantity,
+        onIncrement: event "incrementQuantity" { },
+        onDecrement: event "decrementQuantity" { },
+      ),
+      SizedBox(height: 16.0),
+      ConfirmButton(
+        text: "Continue",
+        require: true,
+        requiredValue: data.workflow.orderNumber,
+        onPressed: event "next" { },
+      ),
+    ]
+  )
+);
+
+// Step 1: Quality inspection — condition / damage photo (its own step)
+widget Step1 = ActivityContainer(
+  child: ListView(
+    children: [
+      ActivityHeader(step: 2, title: "Quality Inspection"),
+      InfoBox(text: "Check the goods for damage and photograph any issues."),
+      SizedBox(height: 16.0),
+      PhotoButton(
+        text: "Add condition photo",
+        onPressed: event "photoTaken" { },
+      ),
+      SizedBox(height: 16.0),
+      ImagePreview(previewPath: data.workflow.photoPath),
+      ConfirmButton(
+        text: "Continue",
+        onPressed: event "next" { },
+      ),
+    ]
+  )
+);
+
+// Step 2: Store — putaway (storage location)
+widget Step2 = ActivityContainer(
+  child: ListView(
+    children: [
+      ActivityHeader(step: 3, title: "Storage Location"),
+      SelectableOption(
+        label: "High-Bay Rack A",
+        value: "High-Bay Rack A",
+        selectedValue: data.workflow.location,
+        onPressed: event "selectLocation" { location: "High-Bay Rack A" },
+      ),
+      SelectableOption(
+        label: "Picking Area B",
+        value: "Picking Area B",
+        selectedValue: data.workflow.location,
+        onPressed: event "selectLocation" { location: "Picking Area B" },
+      ),
+      SelectableOption(
+        label: "Hazmat Store",
+        value: "Hazmat Store",
+        selectedValue: data.workflow.location,
+        onPressed: event "selectLocation" { location: "Hazmat Store" },
+      ),
+      SizedBox(height: 16.0),
+      ConfirmButton(
+        text: "Continue",
+        require: true,
+        requiredValue: data.workflow.location,
+        onPressed: event "next" { },
+      ),
+    ]
+  )
+);
+
+// Step 3: Summary — posting confirmation
+widget Step3 = ActivityContainer(
+  child: ListView(
+    children: [
+      ActivityHeader(step: 4, title: "Receipt Summary"),
+      SizedBox(height: 16.0),
+      SummaryRow(label: "Order number", value: data.workflow.orderNumber),
+      SummaryRow(label: "Product", value: "Washers"),
+      SummaryRow(label: "SKU", value: "WAS-001"),
+      SummaryRow(label: "Quantity", value: data.workflow.quantity),
+      SummaryRow(label: "Location", value: data.workflow.location),
+      SizedBox(height: 16.0),
+      ImagePreview(
+        previewPath: data.workflow.photoPath,
+      ),
+      SizedBox(height: 16.0),
+      ConfirmButton(
+        text: "Confirm Receipt",
+        onPressed: event "submit" { },
+      ),
+    ]
+  )
+);
